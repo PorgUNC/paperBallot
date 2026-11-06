@@ -1,0 +1,59 @@
+{
+  "questions": [
+    {
+      "q": "Do you approve or disapprove of the job Lee Roberts is doing as chancellor of UNC?",
+      "options": [
+        "Approve",
+        "Disapprove",
+        "Don't Know",
+        "I have never heard of Lee Roberts"
+      ]
+    },
+    {
+      "q": "Do you approve or disapprove of the job Adolfo Alvarez is doing as Student Body President?",
+      "options": [
+        "Approve",
+        "Disapprove",
+        "Don't Know",
+        "I have never heard of Adolfo Alvarez"
+      ]
+    },
+    {
+      "q": "This summer, UNC plans to begin construction on a new 700-bed residence hall on North Campus on the current site of the North Campus Tennis Courts and Jackson Hall (which houses the Office of Undergraduate Admissions). Do you approve or disapprove of this project?",
+      "options": [
+        "Approve",
+        "Disapprove",
+        "Don't Know"
+      ]
+    },
+    {
+      "q": "Do you currently live on-campus or off-campus?",
+      "options": [
+        "On-Campus (including Granville Towers)",
+        "Off-Campus"
+      ]
+    },
+    {
+      "q": "What is your major(s)?",
+      "text": true
+    },
+    {
+      "q": "What year did you begin attending UNC?",
+      "options": [
+        "2021",
+        "2022",
+        "2023",
+        "2024",
+        "2025"
+      ]
+    },
+    {
+      "q": "Does the University consider you an in-state, out-of state, or international student?",
+      "options": [
+        "In-state",
+        "Out-of-state",
+        "International"
+      ]
+    }
+  ]
+}

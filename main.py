@@ -10,7 +10,7 @@ def main():
         ret, frame = cap.read()
         if not ret:
             break
-        detector = cv.aruco.ArucoDetector(cv.aruco.getPredefinedDictionary(cv.aruco.DICT_4X4_50), cv.aruco.DetectorParameters())
+        detector = cv.aruco.ArucoDetector(cv.aruco.getPredefinedDictionary(cv.aruco.DICT_5X5_50), cv.aruco.DetectorParameters())
         corners, ids, rejects = detector.detectMarkers(frame)
 
         cv.imshow('frame', cv.aruco.drawDetectedMarkers(frame, corners, ids))
