@@ -31,7 +31,7 @@ def main():
             input_pts = np.float32(points)
             output_pts = np.float32([[0, 0], [0, max_height - 1], [max_width - 1, max_height - 1], [max_width - 1, 0]])
             transform = cv.getPerspectiveTransform(input_pts, output_pts)
-            warped = cv.warpPerspective(frame, transform, (int(max_width), int(max_height)), flags=cv.INTER_LINEAR)
+            warped = cv.warpPerspective(frame, transform, (int(224), int(540)), flags=cv.INTER_LINEAR)
             cv.imshow('warped', warped)
 
 
