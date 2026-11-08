@@ -18,9 +18,16 @@ def main():
             id_order = ids.copy().tolist()
             ids.sort()
             points = []
+            id_count = 0
             for id in ids:
                 corner = corners[id_order.index(id)]
-                points.append(corner[0][0].tolist())
+                point_to_get = id_count
+                if point_to_get == 1:
+                    point_to_get = 3
+                elif point_to_get == 3:
+                    point_to_get = 1
+                points.append(corner[0][point_to_get].tolist())
+                id_count += 1
             # https://theailearner.com/2020/11/06/perspective-transformation/
             width_ad = np.sqrt(((points[0][0] - points[3][0]) ** 2 + (points[0][1] - points[3][1]) ** 2))
             width_bc = np.sqrt(((points[1][0] - points[2][0]) ** 2 + (points[1][1] - points[2][1]) ** 2))
@@ -31,8 +38,11 @@ def main():
             input_pts = np.float32(points)
             output_pts = np.float32([[0, 0], [0, max_height - 1], [max_width - 1, max_height - 1], [max_width - 1, 0]])
             transform = cv.getPerspectiveTransform(input_pts, output_pts)
-            warped = cv.warpPerspective(frame, transform, (int(224), int(540)), flags=cv.INTER_LINEAR)
+            # we want to be 224 by 540
+            warped = cv.warpPerspective(frame, transform, (int(max_width), int(max_height)), flags=cv.INTER_LINEAR)
+            warped = cv.resize(warped, (224, 540))
             cv.imshow('warped', warped)
+
 
 
         if cv.waitKey(1) & 0xFF == ord('q'):

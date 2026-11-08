@@ -8,22 +8,25 @@ import json
 
 from fpdf.enums import MethodReturnValue
 
+# 72 dpi, letter paper
 inch = 72
 width = 11 * inch
 height = 8.5 * inch
 
 one_width = int(width / 3)
 
-def generate_tag(used):
+# Generates a random array of 4 increasing tag ids from 0-49, not using one within the used set
+def generate_tag(used: set):
     while True:
         tag = tuple(sorted(random.sample(range(50), 4)))
         if not tag in used: break
     used.add(tag)
     return tag
 
-def get_tag_bytes(id):
+# Turns a tag id into an aruco tag and returns the image bytes
+def get_tag_bytes(tag_id):
     dictionary = cv.aruco.getPredefinedDictionary(cv.aruco.DICT_5X5_50)
-    tag = cv.aruco.generateImageMarker(dictionary, id, 36)
+    tag = cv.aruco.generateImageMarker(dictionary, tag_id, 36)
     retval, bfr = cv.imencode('.png', tag)
     return bfr.tobytes()
 
@@ -57,7 +60,7 @@ def main():
 
     pdf.set_auto_page_break(False)
 
-    for i in range(args.count):
+    for _ in range(args.count):
         pdf.add_page()
         for i in range(3):
             x_offset = one_width * i
@@ -66,9 +69,9 @@ def main():
             tag_ids = generate_tag(used_tags)
 
             pdf.image(get_tag_bytes(tag_ids[0]), x=18+x_offset, y=18, w=36, h=36)
-            pdf.image(get_tag_bytes(tag_ids[1]), x=one_width-18+x_offset-36, y=18, w=36, h=36)
-            pdf.image(get_tag_bytes(tag_ids[2]), x=18+x_offset, y=height-36-18, w=36, h=36)
-            pdf.image(get_tag_bytes(tag_ids[3]), x=one_width-18+x_offset-36, y=height-18-36, w=36, h=36)
+            pdf.image(get_tag_bytes(tag_ids[3]), x=one_width-18+x_offset-36, y=18, w=36, h=36)
+            pdf.image(get_tag_bytes(tag_ids[2]), x=one_width-18+x_offset-36, y=height-18-36, w=36, h=36)
+            pdf.image(get_tag_bytes(tag_ids[1]), x=18+x_offset, y=height-36-18, w=36, h=36)
 
             # Add logo
             logo_size = (3/4)*inch
@@ -117,7 +120,7 @@ def main():
                                 running_y += out_height + 3
                             else:
                                 q_offset += s_length + 9 + 6
-                                # If it doesnt end perfectly on a column make sure to increase height
+                                # If it doesn't end perfectly on a column make sure to increase height
                                 if question["options"].index(option) == len(question["options"]) - 1:
                                     running_y += 3 + out_height
                                 col_count += 1
