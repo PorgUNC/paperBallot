@@ -1,10 +1,49 @@
+import math
+
 import cv2 as cv
 import numpy as np
+from cv2 import Mat
+import argparse
+import json
+
+
+def extract_votes(img: Mat, ballot_info: dict):
+    box_width = 9
+    extract = {}
+    for question in ballot_info:
+        extract[question] = None
+        if "text" in question:
+            pass
+        else:
+            vals = []
+            for ans in ballot_info[question]["pos"]:
+                coords = ballot_info[question]["pos"][ans]
+                box = img[int(coords[0]):int(coords[0] + box_width), int(coords[1]):int(coords[1] + box_width)]
+                cv.imwrite(f"test_box_{question}_{ans}.png", box)
+
 
 def main():
-    cap = cv.VideoCapture(0)
+    parser = argparse.ArgumentParser(description='Program to extract and upload votes on PORG ballots')
+    parser.add_argument("input", help="json file that describes what to scan on the ballot")
+    parser.add_argument("--camera", "-c", type=int, default=0, const=0, nargs='?', help="Specify which camera to use")
+    parser.add_argument("--upload", "-u", help="If the ballots should be uploaded to the website", action=argparse.BooleanOptionalAction)
+    parser.add_argument("--output", "-o", type=str, required=False, nargs='?', help="The optional file of which to output the results to")
+    args = parser.parse_args()
+
+    ballot_info = {}
+    with open(args.input, "r") as f:
+        try:
+            ballot_info = json.load(f)
+        except json.decoder.JSONDecodeError:
+            print("Invalid json file provided")
+            exit(1)
+
+    cap = cv.VideoCapture(args.camera)
     if not cap.isOpened():
+        print("Coudln't open camera")
         exit(1)
+
+    seen_ballots = set()
 
     while True:
         ret, frame = cap.read()
@@ -13,10 +52,16 @@ def main():
         detector = cv.aruco.ArucoDetector(cv.aruco.getPredefinedDictionary(cv.aruco.DICT_5X5_50), cv.aruco.DetectorParameters())
         corners, ids, rejects = detector.detectMarkers(frame)
 
-        cv.imshow('frame', cv.aruco.drawDetectedMarkers(frame, corners, ids))
+        frame = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
+
+        cv.imshow('frame', frame)
         if not ids is None and len(ids) == 4:
             id_order = ids.copy().tolist()
             ids.sort()
+            if tuple(id_order) in seen_ballots:
+                continue
+            else:
+                seen_ballots.add(tuple(id_order))
             points = []
             id_count = 0
             for id in ids:
@@ -42,6 +87,9 @@ def main():
             warped = cv.warpPerspective(frame, transform, (int(max_width), int(max_height)), flags=cv.INTER_LINEAR)
             warped = cv.resize(warped, (224, 540))
             cv.imshow('warped', warped)
+            cv.imwrite("test_ballot.png", warped)
+
+            extract_votes(warped, ballot_info)
 
 
 
